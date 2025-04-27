@@ -1,58 +1,102 @@
 ﻿using game.Model;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
-using System.Xml.Linq;
+
 
 namespace game
 {
     internal class MainForm : Form
     {
-        private Panel _playerPanel;
         private GameModel _game;
         public MainForm()
         {
+            DoubleBuffered = true;
+            Width = 1280;
+            Height = 720;
             _game = new GameModel();
             _game.Updated += Update;
-            SetPlayer();
-            SetGrounds();
 
+            KeyPreview = true;
+            KeyDown += (s, e) => _game.PressKey(e.KeyCode);
+            KeyUp += (s, e) => _game.ReleaseKey(e.KeyCode);
+
+            MouseMove += OnMouseMove; //
         }
 
-        public void SetPlayer()
-        {
-            var player = _game.Players[0];
-            _playerPanel = new Panel();
-            _playerPanel.BackColor = Color.Blue;
-            _playerPanel.Size = new Size(player.Width, player.Height);
-            _playerPanel.Location = new Point((int)player.X, (int)player.Y);
-            Controls.Add(_playerPanel);
-        }
-        public void SetGrounds()
+        private void DrawGame(Graphics g)
         {
             foreach (var ground in _game.Grounds)
             {
-                var groundPanel = new Panel();
-                groundPanel.BackColor = Color.Red;
-                groundPanel.Size = new Size((int)ground.Width, (int)ground.Height);
-                groundPanel.Location = new Point((int)ground.X, (int)ground.Y);
-                Controls.Add(groundPanel);
+                g.FillRectangle(Brushes.Red, (float)ground.X, (float)ground.Y, (float)ground.Width, (float)ground.Height);
             }
+
+            foreach (var player in _game.Players)
+            {
+                g.FillRectangle(Brushes.Blue, (float)player.X, (float)player.Y, player.Width, player.Height);
+            }
+
+            Coords(g);
         }
 
         void Update()
         {
-            var player = _game.Players[0];
-            _playerPanel.Location = new Point((int)player.X,(int)player.Y);
+            Invalidate();
+        }
+
+        private float GetScale()
+        {
+            float scaleX = (float)ClientSize.Width / GameModel.Width;
+            float scaleY = (float)ClientSize.Height / GameModel.Height;
+            return Math.Min(scaleX, scaleY);
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            var g = e.Graphics;
+
+            float scale = GetScale();
+            float offsetX = (ClientSize.Width - GameModel.Width * scale) / 2;
+            float offsetY = (ClientSize.Height - GameModel.Height * scale) / 2;
+
+            g.TranslateTransform(offsetX, offsetY + GameModel.Height * scale);
+            g.ScaleTransform(scale, -scale);
+
+            DrawGame(g);
         }
 
         public static void Main()
         {
             Application.Run(new MainForm());
+        }
+
+
+        private PointF mouseModelCoords;
+        private void OnMouseMove(object sender, MouseEventArgs e)
+        {
+            float scale = GetScale();
+            float offsetX = (ClientSize.Width - GameModel.Width * scale) / 2;
+            float offsetY = (ClientSize.Height - GameModel.Height * scale) / 2;
+
+            float x = (e.X - offsetX) / scale;
+            float y = GameModel.Height - (e.Y - offsetY) / scale;
+
+            mouseModelCoords = new PointF(x, y);
+            Invalidate(); 
+        }
+
+
+        private void Coords(Graphics g)
+        {
+            g.ResetTransform(); 
+            g.DrawString(
+                $"Cursor: X={mouseModelCoords.X:F1}, Y={mouseModelCoords.Y:F1}",
+                new Font("Arial", 12),
+                Brushes.Black,
+                new PointF(10, 10)
+            );
         }
     }
 }

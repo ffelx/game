@@ -8,12 +8,12 @@ namespace game.Model
 {
     internal class Ground
     {
-        public double X;
-        public double Y;
-        public double Width;
-        public double Height;
+        public float X;
+        public float Y;
+        public float Width;
+        public float Height;
 
-        public Ground(double x, double y, double width, double height) 
+        public Ground(float x, float y, float width, float height) 
         {
             X = x; 
             Y = y; 
