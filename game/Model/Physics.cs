@@ -4,21 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace game.Model
+namespace Game.Model
 {
     internal class Physics
     {
-        private const float g = -0.1f;
-
-        public bool TryLandOnGround(Player player, Ground[] grounds)
+        private const float Gravity = -0.2f;
+        public bool TryLandOnGround(Player player, Ground[] grounds, out Ground value)
         {
+            value = null;
             foreach (var ground in grounds)
             {
                 var tempPlayer = new Player(player.X, player.Y + player.VelocityY);
-                if (IsOnGround(tempPlayer, ground))
+                if (IsOnGround(tempPlayer, ground) 
+                    && player.VelocityY <= 0
+                    && !player.IgnorePlatformCollision)
                 {
                     player.Y = ground.Y + ground.Height;
                     player.VelocityY = 0;
+                    value = ground;
                     return true;
                 }
             }
@@ -50,7 +53,22 @@ namespace game.Model
 
         public void ApplyGravity(Player player)
         {
-            player.ApplyGravity(g);
+            player.ApplyGravity(Gravity);
+        }
+
+        public bool TryHitPlayerWithBullet(Bullet bullet, Player target)
+        {
+            bool isHit = bullet.X < target.X + target.Width &&
+                        bullet.X + bullet.Width > target.X &&
+                        bullet.Y < target.Y + target.Height &&
+                        bullet.Y + bullet.Height > target.Y;
+
+            if (isHit)
+            {
+                target.ApplyKnockback(bullet.Direction);
+            }
+
+            return isHit;
         }
     }
 }

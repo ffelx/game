@@ -1,15 +1,20 @@
-﻿using game.Model;
+﻿using Game.Model;
 using System;
 using System.Drawing;
 
-namespace game.View
+namespace Game.View
 {
     internal class TextureManager : IDisposable
     {
         private Bitmap _playerTextureRight;
         private Bitmap _playerTextureLeft;
+
         private Bitmap _backgroundOriginal;
         private Bitmap _backgroundCache;
+
+        private Bitmap _gunTextureRight;
+        private Bitmap _gunTextureLeft;
+
         private float _cachedScale = -1f;
 
         public TextureManager()
@@ -19,11 +24,15 @@ namespace game.View
 
         private void LoadTextures()
         {
-            _playerTextureRight = new Bitmap("Images/player2.png");
+            _playerTextureRight = new Bitmap("Images/player1.png");
             _playerTextureLeft = new Bitmap(_playerTextureRight);
             _playerTextureLeft.RotateFlip(RotateFlipType.RotateNoneFlipX);
 
             _backgroundOriginal = new Bitmap("Images/location.jpg");
+
+            _gunTextureRight = new Bitmap("Images/gun.png");
+            _gunTextureLeft = new Bitmap(_gunTextureRight);
+            _gunTextureLeft.RotateFlip(RotateFlipType.RotateNoneFlipX);
         }
 
         public Bitmap GetPlayerTexture(Player.Direction direction)
@@ -35,7 +44,7 @@ namespace game.View
         {
             if (_backgroundOriginal == null) return null;
 
-            if (_backgroundCache != null && Math.Abs(_cachedScale - scale) < 0.01f)
+            if (_backgroundCache != null && Math.Abs(_cachedScale - scale) < 0.001f)
             {
                 return _backgroundCache;
             }
@@ -57,6 +66,11 @@ namespace game.View
             }
 
             return _backgroundCache;
+        }
+
+        public Bitmap GetGunTexture(Player.Direction direction)
+        {
+            return direction == Player.Direction.Left ? _gunTextureLeft : _gunTextureRight;
         }
 
         public void Dispose()

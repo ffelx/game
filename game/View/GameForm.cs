@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using game.Model;
-using game.View;
+using Game.Model;
+using Game.View;
 
-namespace game
+namespace Game
 {
-    internal class MainForm : Form
+    internal class GameForm : Form
     {
         private GameModel _game;
         private GameRenderer _renderer;
@@ -15,7 +15,7 @@ namespace game
         private long _lastFrameTimeMs = 0;
         private Font _debugFont = new Font("Arial", 12);
 
-        public MainForm()
+        public GameForm()
         {
             DoubleBuffered = true;
             Width = 1280;
@@ -76,9 +76,6 @@ namespace game
             _textures.Dispose();
         }
 
-        public static void Main()
-        {
-            Application.Run(new MainForm());
-        }
+        
     }
 }

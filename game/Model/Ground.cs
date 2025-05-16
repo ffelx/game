@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace game.Model
+namespace Game.Model
 {
     internal class Ground
     {
@@ -12,6 +12,7 @@ namespace game.Model
         public float Y;
         public float Width;
         public float Height;
+        public bool CanDropDown { get; set; } = true;
 
         public Ground(float x, float y, float width, float height) 
         {
