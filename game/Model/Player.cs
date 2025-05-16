@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace game.Model
 {
+    
     internal class Player
     {
+        public Direction CurrentDirection { get; set; } = Direction.Right;
+
         public float X { get; set; }
         public float Y { get; set; }
         
@@ -37,10 +40,12 @@ namespace game.Model
             X = positionX;
             Y = positionY;
             Width = 50;
-            Height = 120;
+            Height = 95;
             MaxSpeed = 4;
             JumpForce = 3;
         }
+
+        
 
         public void ApplyGravity(float g)
         {
@@ -59,6 +64,12 @@ namespace game.Model
             resultSpeed = resultSpeed < 0 ? 0 : resultSpeed;
             _velocityX = resultSpeed * sign;
         }
-
+        public enum Direction
+        {
+            Left,
+            Right
+        }
     }
+
+    
 }

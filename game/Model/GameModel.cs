@@ -9,13 +9,13 @@ namespace game.Model
 
     internal class GameModel
     {
-        private HashSet<Keys> _pressedKeys = new HashSet<Keys>();
-        
+        private InputHandler _inputHandler = new InputHandler();
+        private Physics _physics = new Physics();
+        private GameLoop _loop = new GameLoop();
+
         public const int Width = 1280;
         public const int Height = 720;
 
-        private const float g = -0.1f; 
-        private Timer _timer;
         public Player[] Players { get; private set; }
         public Ground[] Grounds { get; private set; }
         
@@ -25,110 +25,73 @@ namespace game.Model
             SetPlayers();
             SetGrounds();
 
-            _timer = new Timer();
-            _timer.Interval = 17;
-            _timer.Tick += Update;
-            _timer.Start();
+            _loop.Tick += Update;
+            _loop.Start();
         }
 
         private void SetPlayers()
         {
-            Players = new Player[1] { new Player(80, 500) };
+            Players = new Player[2] 
+            { 
+                new Player(100, 500),
+                new Player(700, 500)
+            };
+
         }
 
         private void SetGrounds()
         {
-            Grounds = new Ground[2]
+            Grounds = new Ground[3]
             {
-                 new Ground(100, 100, 1000, 30),
-                 new Ground(20, 200, 1000, 10),
+                 new Ground(242, 84, 797, 30),
+                 new Ground(242, 228, 318, 10),
+                 new Ground(720, 228, 318, 10),
             };
         }
 
-        private void Update(object sender, EventArgs e)
+        public void PressKey(Keys key) => _inputHandler.PressKey(key);
+        public void ReleaseKey(Keys key) => _inputHandler.ReleaseKey(key);
+
+        private void Update()
         {
             foreach (var player in Players)
             {
-                bool isLeft = _pressedKeys.Contains(Keys.A);
-                bool isRight = _pressedKeys.Contains(Keys.D);
-                if (isLeft)
-                {
-                    player.VelocityX -= player.Acceleration;
-                }
-                if (isRight)
-                {
-                    player.VelocityX += player.Acceleration;
-                }
-                if (!isLeft && !isRight)
-                {
-                    player.Stop();
-                }
+                PlayerMoveUpdate(player);
 
-                bool isGround = TryLandOnGround(player);
-                if (_pressedKeys.Contains(Keys.W) && isGround)
+                bool isGround = _physics.TryLandOnGround(player, Grounds);
+                if (_inputHandler.IsKeyPressed(Keys.W) && isGround)
                 {
                     player.VelocityY += player.JumpForce;
                 }
 
                 if (!isGround)
                 {
-                    player.ApplyGravity(g);
+                    _physics.ApplyGravity(player);
                 }
                
                 player.UpdatePosition();
-               
             }
             Updated.Invoke();
         }
 
-        private bool TryLandOnGround(Player player)
+        private void PlayerMoveUpdate(Player player)
         {
-            foreach (var ground in Grounds)
+            bool isLeft = _inputHandler.IsKeyPressed(Keys.A);
+            bool isRight = _inputHandler.IsKeyPressed(Keys.D);
+            if (isLeft)
             {
-                var tempPlayer = new Player(player.X, player.Y + player.VelocityY);
-                if (IsOnGround(tempPlayer, ground))
-                {
-                    player.Y = ground.Y + ground.Height;
-                    player.VelocityY = 0;
-                    return true;
-                }
+                player.VelocityX -= player.Acceleration;
+                player.CurrentDirection = Player.Direction.Left;
             }
-            return false;
-        }
-
-        private static bool AreIntersected(Player player, Ground ground)
-        {
-            return !(player.X + player.Width < ground.X ||
-                 ground.X + ground.Width < player.X ||
-                 player.Y > ground.Y + ground.Height ||
-                 player.Y + player.Height < ground.Y);
-        }
-
-
-        private static bool IsPointInside(Ground ground, float x, float y)
-        {
-            return x >= ground.X &&
-                   x <= ground.X + ground.Width &&
-                   y >= ground.Y &&
-                   y <= ground.Y + ground.Height;
-        }
-
-        private static bool IsOnGround(Player player, Ground ground)
-        {
-            return IsPointInside(ground, player.X, player.Y) 
-                || IsPointInside(ground, player.X + player.Width, player.Y);
-        }
-
-        public void PressKey(Keys key)
-        {
-            //MessageBox.Show("");
-            _pressedKeys.Add(key);
-        }
-
-        public void ReleaseKey(Keys key)
-        {
-           // MessageBox.Show("");
-            _pressedKeys.Remove(key);
+            if (isRight)
+            {
+                player.VelocityX += player.Acceleration;
+                player.CurrentDirection = Player.Direction.Right;
+            }
+            if (!isLeft && !isRight)
+            {
+                player.Stop();
+            }
         }
     }
 }
