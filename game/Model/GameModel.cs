@@ -1,41 +1,63 @@
-﻿using System;
+﻿using game.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Media;
 using System.Windows.Forms;
 
 namespace Game.Model
 {
-
     internal class GameModel
     {
         private InputHandler _inputHandler = new InputHandler();
         private Physics _physics = new Physics();
         private GameLoop _loop = new GameLoop();
+        private BotController _botController;
+        private bool _isBotGame = false;
+
+        public int SecondPlayerScore { get; set; }
+        public int FirstPlayerScore { get; set; }
+        private int _maxScore = 5;
 
         public const int Width = 1280;
         public const int Height = 720;
 
-        public Player[] Players { get; private set; }
+        public List<Player> Players { get; private set; }
         public Ground[] Grounds { get; private set; }
         
         public event Action Updated;
-        public GameModel()
+        public GameModel(bool isBotGame = false)
         {
+            SetGrounds();          
             SetPlayers();
-            SetGrounds();
+            SetBotIfBotGame(isBotGame);
 
             _loop.Tick += Update;
             _loop.Start();
         }
 
+        private void SetBotIfBotGame(bool isBotGame)
+        {
+            _isBotGame = isBotGame;
+            if (isBotGame)
+            {
+                _botController = new BotController(this, _physics);      
+                Players[1].JumpForce += 0.1f;
+            }
+        }
+
         private void SetPlayers()
         {
-            Players = new Player[2] 
+            Players = new List<Player>()
             { 
                 new Player(350, 720),
                 new Player(870, 720) { CurrentDirection = Player.Direction.Left}
             };
+            //if (_isBotGame)
+            //{
+            //    Players[1].JumpForce += 20f;
+            //}
+           
+
         }
 
         private void SetGrounds()
@@ -53,17 +75,75 @@ namespace Game.Model
 
         private void Update()
         {
-            for (int i = 0; i < Players.Length; i++)
+            for (int i = 0; i < Players.Count; i++)
             {
                 int playerNumber = i + 1;
                 var player = Players[i];
-                PlayerMoveUpdate(player, playerNumber);
-                BulletsUpdate(player);
+
+                PlayerOrBotUpdate(player, playerNumber);
+                BulletsUpdate(player, playerNumber);
+                PlayerStateUpdate(player, playerNumber);
             }
             Updated?.Invoke();
         }
 
+        private void PlayerStateUpdate(Player player, int playerNumber)
+        {
+            if (player.Y < -player.Height)
+            {
+                Console.WriteLine("sds");
+                if (playerNumber == 1)
+                {
+                    SecondPlayerScore += 1;
+                }
+                else
+                {
+                    FirstPlayerScore += 1;
+                }
+                player.VelocityY = 0;
+                player.X = player.StartPoint.X;
+                player.Y = player.StartPoint.Y;
+            }
+        }
+
+        public bool IsGameOver(out int winPlayerNumber)
+        {
+            winPlayerNumber = 0;
+            
+            if (FirstPlayerScore >= _maxScore)
+            {
+                winPlayerNumber = 1;
+                return true;
+            }
+            else if (SecondPlayerScore >= _maxScore)
+            {
+                winPlayerNumber = 2;
+                return true;
+            }
+            return false;
+        }
+
+        private void PlayerOrBotUpdate(Player player, int playerNumber)
+        {
+            if (!_isBotGame || playerNumber == 1)
+            {
+                PlayerMoveUpdate(player, playerNumber);
+            }
+            else
+            {
+                _botController.Update();
+            }
+        }
+
         private void PlayerMoveUpdate(Player player, int playerNumber)
+        {
+            MoveLeftOrRight(player, playerNumber);
+            MoveUpDown(player, playerNumber);
+            player.UpdatePosition();
+        }
+
+
+        private void MoveLeftOrRight(Player player, int playerNumber)
         {
             bool isLeft = _inputHandler.IsKeyPressed(playerNumber == 1 ? Keys.A : Keys.Left, playerNumber);
             bool isRight = _inputHandler.IsKeyPressed(playerNumber == 1 ? Keys.D : Keys.Right, playerNumber);
@@ -82,11 +162,10 @@ namespace Game.Model
             {
                 player.Stop();
             }
-            if (_inputHandler.IsKeyPressed(playerNumber == 1 ? Keys.E : Keys.ControlKey, playerNumber))
-            {
-                player.Shoot();
-            }
+        }
 
+        private void MoveUpDown(Player player, int playerNumber)
+        {
             bool isGround = _physics.TryLandOnGround(player, Grounds, out var ground);
 
             if (_inputHandler.IsKeyPressed(playerNumber == 1 ? Keys.W : Keys.Up, playerNumber) && isGround)
@@ -101,22 +180,19 @@ namespace Game.Model
 
             var downKey = playerNumber == 1 ? Keys.S : Keys.Down;
             if (isGround
-                && _inputHandler.IsKeyPressed(downKey, playerNumber) 
+                && _inputHandler.IsKeyPressed(downKey, playerNumber)
                 && ground.CanDropDown
                 && !player.IgnorePlatformCollision)
             {
                 player.StartDropDown();
             }
-
             if (player.IgnorePlatformCollision)
             {
                 player.UpdateDropDown(GameLoop.Interval / 1000f);
             }
-
-            player.UpdatePosition();
         }
 
-        private void BulletsUpdate(Player player)
+        private void BulletsUpdate(Player player, int playerNumber)
         {
             float deltaTime = GameLoop.Interval / 1000f;
             player.UpdateCooldown(deltaTime);
@@ -137,8 +213,11 @@ namespace Game.Model
                     player.Bullets.Remove(bullet);
                 }
             }
+
+            if (_inputHandler.IsKeyPressed(playerNumber == 1 ? Keys.E : Keys.ControlKey, playerNumber))
+            {
+                player.Shoot();
+            }
         }
-
-
     }
 }

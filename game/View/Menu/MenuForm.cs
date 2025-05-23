@@ -1,5 +1,7 @@
-﻿using System;
+﻿
+using System;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Game.View
@@ -14,12 +16,9 @@ namespace Game.View
 
         private void InitializeForm()
         {
-            this.Text = "Game Menu";
-            this.Size = new Size(1280, 720);
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.MinimumSize = new Size(350, 300);
-            this.BackColor = Color.FromArgb(240, 240, 240);
-            this.FormBorderStyle = FormBorderStyle.Sizable;
+            Size = new Size(1280, 720);
+            StartPosition = FormStartPosition.CenterScreen;
+            BackColor = Color.FromArgb(195, 195, 196);
         }
 
         private void InitializeControls()
@@ -27,7 +26,8 @@ namespace Game.View
             var containerPanel = new Panel
             {
                 Dock = DockStyle.Fill,
-                AutoScroll = true
+                AutoScroll = true,
+                BackColor = Color.FromArgb(0, 0, 0, 0),
             };
             this.Controls.Add(containerPanel);
 
@@ -36,24 +36,20 @@ namespace Game.View
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 ColumnCount = 1,
-                RowCount = 3
+                RowCount = 2//3
             };
 
             buttonTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 80));
             buttonTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 80));
-            buttonTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 80));
 
             var btnNewGame = CreateMenuButton("НОВАЯ ИГРА", Color.LightSkyBlue);
-            btnNewGame.Click += (s, e) => MessageBox.Show("Новая игра!");
+            btnNewGame.Click += (s, e) => NewGame();
             buttonTable.Controls.Add(btnNewGame, 0, 0);
 
-            var btnSettings = CreateMenuButton("НАСТРОЙКИ", Color.LightGray);
-            btnSettings.Click += (s, e) => MessageBox.Show("Настройки");
-            buttonTable.Controls.Add(btnSettings, 0, 1);
 
             var btnExit = CreateMenuButton("ВЫХОД", Color.LightCoral);
             btnExit.Click += (s, e) => this.Close();
-            buttonTable.Controls.Add(btnExit, 0, 2);
+            buttonTable.Controls.Add(btnExit, 0, 1);
 
             containerPanel.Controls.Add(buttonTable);
             buttonTable.Location = new Point(
@@ -68,6 +64,16 @@ namespace Game.View
                     (containerPanel.ClientSize.Height - buttonTable.Height) / 2
                 );
             };
+        }
+
+        private void NewGame()
+        {
+            var newGameForm = new NewGameForm();
+            newGameForm.Width = Width;
+            newGameForm.Height = Height;
+            Hide();
+            newGameForm.ShowDialog();
+            Close();
         }
 
         private Button CreateMenuButton(string text, Color backColor)

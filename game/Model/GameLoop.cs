@@ -5,7 +5,7 @@ namespace Game.Model
 {
     public class GameLoop
     {
-        public const int Interval = 17;
+        public const int Interval = 15;
         private Timer _timer;
         public event Action Tick;
 

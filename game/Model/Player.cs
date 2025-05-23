@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,13 +13,15 @@ namespace Game.Model
     {
         public Direction CurrentDirection { get; set; } = Direction.Right;
 
+        public PointF StartPoint { get; set; }
+
         public float X { get; set; }
         public float Y { get; set; }
         
         public int Width { get; set; }
         public int Height { get; set; }
         public float MaxSpeed { get; set; }
-        public float JumpForce { get; set; }
+        public float JumpForce { get; set; } = 3.52f;
         public float Acceleration { get; set; } = 0.5f;
         private float _velocityX;
         public float VelocityX
@@ -39,9 +42,8 @@ namespace Game.Model
         public List<Bullet> Bullets { get; } = new List<Bullet>();
         
         
-        private float _shootCooldown = 0.5f; 
+        private float _shootCooldown = 0.7f; 
         private float _currentCooldown = 0;
-        public float KnockbackForce { get; } = 15f;
 
         public bool IgnorePlatformCollision { get; private set; }
         private float _ignoreCollisionTimer = 0;
@@ -54,7 +56,7 @@ namespace Game.Model
             Width = 50;
             Height = 95;
             MaxSpeed = 4;
-            JumpForce = 7.0f;
+            StartPoint = new PointF(positionX, positionY);
         }
 
         
@@ -63,11 +65,11 @@ namespace Game.Model
             VelocityY += g;
         }
 
-        public void ApplyKnockback(Direction bulletDirection)
+        public void ApplyKnockback(Direction bulletDirection, Bullet bullet)
         {
             _velocityX -= bulletDirection == Direction.Right
-                ? -KnockbackForce
-                : KnockbackForce;
+                ? -bullet.KnockbackForce
+                : bullet.KnockbackForce;
             
         }
 
@@ -110,8 +112,12 @@ namespace Game.Model
         public void StartDropDown()
         {
             //MessageBox.Show("StartDropDown");
-            IgnorePlatformCollision = true;
-            _ignoreCollisionTimer = _dropDownTime;
+            if (!IgnorePlatformCollision)
+            {
+                IgnorePlatformCollision = true;
+                _ignoreCollisionTimer = _dropDownTime;
+            }
+            
         }
 
         public void UpdateDropDown(float time)
@@ -134,6 +140,4 @@ namespace Game.Model
             Right
         }
     }
-
-    
 }

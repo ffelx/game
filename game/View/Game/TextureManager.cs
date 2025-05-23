@@ -28,7 +28,7 @@ namespace Game.View
             _playerTextureLeft = new Bitmap(_playerTextureRight);
             _playerTextureLeft.RotateFlip(RotateFlipType.RotateNoneFlipX);
 
-            _backgroundOriginal = new Bitmap("Images/location.jpg");
+            _backgroundOriginal = new Bitmap("Images/location1.jpg");
 
             _gunTextureRight = new Bitmap("Images/gun.png");
             _gunTextureLeft = new Bitmap(_gunTextureRight);

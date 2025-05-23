@@ -8,7 +8,7 @@ namespace Game.Model
 {
     internal class Physics
     {
-        private const float Gravity = -0.2f;
+        private const float Gravity = -0.05f;
         public bool TryLandOnGround(Player player, Ground[] grounds, out Ground value)
         {
             value = null;
@@ -65,7 +65,7 @@ namespace Game.Model
 
             if (isHit)
             {
-                target.ApplyKnockback(bullet.Direction);
+                target.ApplyKnockback(bullet.Direction, bullet);
             }
 
             return isHit;
