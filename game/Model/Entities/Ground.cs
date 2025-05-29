@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Game.Model
+﻿namespace Game.Model
 {
     internal class Ground
     {
@@ -21,6 +15,5 @@ namespace Game.Model
             Width = width; 
             Height = height;
         }
-
     }
 }

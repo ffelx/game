@@ -1,4 +1,4 @@
-﻿using Game.View;
+﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -6,12 +6,11 @@ namespace Game
 {
     public class GameEndForm : Form
     {
+        public event Action OnMenuClicked;
         public GameEndForm(int winnerNumber)
         {
             StartPosition = FormStartPosition.CenterScreen;
-
-            BackgroundImage = Image.FromFile("Images/background.png");
-            BackgroundImageLayout = ImageLayout.Stretch; 
+            BackColor = Color.FromArgb(195, 195, 196);
             
             var menuButton = new Button
             {
@@ -22,17 +21,7 @@ namespace Game
                 
             };
             menuButton.FlatAppearance.BorderSize = 0;
-            menuButton.Click += (s, e) =>
-            {
-                var menuForm = new MenuForm();
-                menuForm.Width = Width;
-                menuForm.Height = Height;
-
-                Program.Context.MainForm = menuForm;
-                Hide();
-                menuForm.ShowDialog();
-                Close();
-            };
+            menuButton.Click += (s, e) => OnMenuClicked?.Invoke();
 
             var titleLabel = new Label
             {
@@ -46,7 +35,6 @@ namespace Game
                 (ClientSize.Width - titleLabel.Width) / 2,
                 (ClientSize.Height - titleLabel.Height) / 2
             );
-
           
             this.Resize += (s, e) =>
             {

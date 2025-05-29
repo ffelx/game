@@ -1,13 +1,14 @@
-﻿
-using System;
+﻿using System;
 using System.Drawing;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Game.View
 {
-    internal class MenuForm : Form
+    public class MenuForm : Form
     {
+        public event Action OnNewGameClicked;
+        public event Action OnExitClicked;
+
         public MenuForm()
         {
             InitializeForm();
@@ -36,19 +37,18 @@ namespace Game.View
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 ColumnCount = 1,
-                RowCount = 2//3
+                RowCount = 2
             };
 
             buttonTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 80));
             buttonTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 80));
 
-            var btnNewGame = CreateMenuButton("НОВАЯ ИГРА", Color.LightSkyBlue);
-            btnNewGame.Click += (s, e) => NewGame();
+            var btnNewGame = CreateMenuButton("Новая игра", Color.LightSkyBlue);
+            btnNewGame.Click += (s, e) => OnNewGameClicked?.Invoke(); 
             buttonTable.Controls.Add(btnNewGame, 0, 0);
 
-
-            var btnExit = CreateMenuButton("ВЫХОД", Color.LightCoral);
-            btnExit.Click += (s, e) => this.Close();
+            var btnExit = CreateMenuButton("Выход", Color.LightCoral);
+            btnExit.Click += (s, e) => OnExitClicked?.Invoke(); 
             buttonTable.Controls.Add(btnExit, 0, 1);
 
             containerPanel.Controls.Add(buttonTable);
@@ -66,16 +66,6 @@ namespace Game.View
             };
         }
 
-        private void NewGame()
-        {
-            var newGameForm = new NewGameForm();
-            newGameForm.Width = Width;
-            newGameForm.Height = Height;
-            Hide();
-            newGameForm.ShowDialog();
-            Close();
-        }
-
         private Button CreateMenuButton(string text, Color backColor)
         {
             return new Button
@@ -88,7 +78,7 @@ namespace Game.View
                 FlatAppearance = { BorderSize = 0 },
                 Cursor = Cursors.Hand,
                 Anchor = AnchorStyles.None,
-                Margin = new Padding(10) 
+                Margin = new Padding(10)
             };
         }
     }

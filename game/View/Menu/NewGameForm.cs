@@ -1,10 +1,14 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace Game.View
 {
-    internal class NewGameForm : Form
+    public class NewGameForm : Form
     {
+        public event Action OnTwoPlayersClicked;
+        public event Action OnBotGameClicked;
+
         public NewGameForm()
         {
             InitializeForm();
@@ -26,7 +30,8 @@ namespace Game.View
                 AutoScroll = true,
                 BackColor = Color.Transparent
             };
-            this.Controls.Add(containerPanel);
+            
+            Controls.Add(containerPanel);
 
             var buttonTable = new TableLayoutPanel
             {
@@ -39,16 +44,14 @@ namespace Game.View
 
             buttonTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 80));
             buttonTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 80));
-           
 
-            var btnNewGame = CreateMenuButton("Два игрока", Color.LightSkyBlue);
-            btnNewGame.Click += (s, e) => StartGame(false);
-            buttonTable.Controls.Add(btnNewGame, 0, 0);
+            var btnTwoPlayers = CreateMenuButton("Два игрока", Color.LightSkyBlue);
+            btnTwoPlayers.Click += (s, e) => OnTwoPlayersClicked?.Invoke(); 
+            buttonTable.Controls.Add(btnTwoPlayers, 0, 0);
 
-            var btnSettings = CreateMenuButton("С ботом", Color.Gray);
-            btnSettings.Click += (s, e) => StartGame(true);
-            buttonTable.Controls.Add(btnSettings, 0, 1);
-
+            var btnBotGame = CreateMenuButton("С ботом", Color.Gray);
+            btnBotGame.Click += (s, e) => OnBotGameClicked?.Invoke(); 
+            buttonTable.Controls.Add(btnBotGame, 0, 1);
 
             containerPanel.Controls.Add(buttonTable);
             buttonTable.Location = new Point(
@@ -63,16 +66,6 @@ namespace Game.View
                     (containerPanel.ClientSize.Height - buttonTable.Height) / 2
                 );
             };
-        }
-
-        private void StartGame(bool isBot)
-        {
-            var gameForm = new GameForm(isBot);
-            gameForm.Width = Width;
-            gameForm.Height = Height;
-            Hide();
-            gameForm.ShowDialog();
-            Close();
         }
 
         private Button CreateMenuButton(string text, Color backColor)

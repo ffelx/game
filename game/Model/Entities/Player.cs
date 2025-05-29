@@ -1,23 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace Game.Model
 {
-    
     internal class Player
     {
         public Direction CurrentDirection { get; set; } = Direction.Right;
-
         public PointF StartPoint { get; set; }
-
         public float X { get; set; }
         public float Y { get; set; }
-        
         public int Width { get; set; }
         public int Height { get; set; }
         public float MaxSpeed { get; set; }
@@ -41,7 +33,6 @@ namespace Game.Model
 
         public List<Bullet> Bullets { get; } = new List<Bullet>();
         
-        
         private float _shootCooldown = 0.7f; 
         private float _currentCooldown = 0;
 
@@ -59,7 +50,6 @@ namespace Game.Model
             StartPoint = new PointF(positionX, positionY);
         }
 
-        
         public void ApplyGravity(float g)
         {
             VelocityY += g;
@@ -111,7 +101,6 @@ namespace Game.Model
 
         public void StartDropDown()
         {
-            //MessageBox.Show("StartDropDown");
             if (!IgnorePlatformCollision)
             {
                 IgnorePlatformCollision = true;
@@ -122,7 +111,6 @@ namespace Game.Model
 
         public void UpdateDropDown(float time)
         {
-            //MessageBox.Show("StartDropDown");
             if (IgnorePlatformCollision)
             {
                 _ignoreCollisionTimer -= time;
@@ -131,7 +119,6 @@ namespace Game.Model
                     IgnorePlatformCollision = false;
                 }
             }
-            
         }
 
         public enum Direction

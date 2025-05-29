@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using System.Xml.Linq;
 using Game.Model;
 
 namespace Game.View
@@ -8,13 +7,13 @@ namespace Game.View
     {
         private readonly TextureManager _textures;
         private readonly Font _scoreFont;
-        private readonly StringFormat _scoreFormat; 
+        private readonly StringFormat _scoreFormat;
 
         public GameRenderer(TextureManager textures)
         {
             _textures = textures;
-            _scoreFont = new Font("Arial", 24, FontStyle.Bold); 
-            _scoreFormat = new StringFormat(); 
+            _scoreFont = new Font("Arial", 24, FontStyle.Bold);
+            _scoreFormat = new StringFormat();
         }
 
         public void Render(Graphics g, GameModel game, GameForm gameForm, float scale)
@@ -36,11 +35,6 @@ namespace Game.View
 
         private void RenderGameObjects(Graphics g, GameModel game)
         {
-            foreach (var ground in game.Grounds)
-            {
-                //g.FillRectangle(Brushes.Red, ground.X, ground.Y, ground.Width, ground.Height);
-            }
-
             foreach (var player in game.Players)
             {
                 var texture = _textures.GetPlayerTexture(player.CurrentDirection);
@@ -72,7 +66,7 @@ namespace Game.View
 
         public void RenderScore(Graphics g, GameModel game, GameForm gameForm)
         {
-            string scoreText = $"{game.FirstPlayerScore} : {game.SecondPlayerScore}";
+            string scoreText = $"{game.SecondPlayerScore} : {game.FirstPlayerScore}";
             var textSize = g.MeasureString(scoreText, _scoreFont);
             var originalTransform = g.Transform;
 
@@ -81,17 +75,10 @@ namespace Game.View
             float scoreX = (gameForm.ClientSize.Width - textSize.Width) / 2;
             float scoreY = 0;
 
-            
             g.DrawString(scoreText, _scoreFont, Brushes.Black, scoreX + 2, scoreY + 2, _scoreFormat);
             g.DrawString(scoreText, _scoreFont, Brushes.White, scoreX, scoreY, _scoreFormat);
 
             g.Transform = originalTransform;
-        }
-
-        public void Dispose()
-        {
-            _scoreFont?.Dispose();
-            _scoreFormat?.Dispose();
         }
     }
 }

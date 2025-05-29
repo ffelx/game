@@ -38,14 +38,6 @@ namespace game.Model
                 _decisionTime = _random.Next(2, 5) * _decisionTimeCoefficient;
             }
 
-            //var currentDistance = Math.Abs(_target.X - _bot.X);
-            //if (Math.Abs(_bot.VelocityX) > _bot.MaxSpeed
-            //    || _oldDistanceToPlayer < currentDistance)
-            //{
-            //    //_bot.Stop();
-            //    _oldDistanceToPlayer = currentDistance;
-            //}
-
             _bot.Shoot();
             UpdateBotMovement();
         }
@@ -65,9 +57,7 @@ namespace game.Model
             }
 
             _bot.CurrentDirection = newDirection;
-
-           
-                _bot.VelocityX += _centerX > _bot.X ? _bot.Acceleration : -_bot.Acceleration;
+            _bot.VelocityX += _centerX > _bot.X ? _bot.Acceleration : -_bot.Acceleration;
 
             
             if (isGround && _random.NextDouble() < 0.1)

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Game.Model
+﻿namespace Game.Model
 {
     internal class Physics
     {
@@ -27,7 +21,6 @@ namespace Game.Model
             }
             return false;
         }
-
         private static bool IsOnGround(Player player, Ground ground)
         {
             return IsPointInside(ground, player.X, player.Y)
@@ -40,15 +33,6 @@ namespace Game.Model
                    x <= ground.X + ground.Width &&
                    y >= ground.Y &&
                    y <= ground.Y + ground.Height;
-        }
-
-
-        private static bool AreIntersected(Player player, Ground ground)
-        {
-            return !(player.X + player.Width < ground.X ||
-                 ground.X + ground.Width < player.X ||
-                 player.Y > ground.Y + ground.Height ||
-                 player.Y + player.Height < ground.Y);
         }
 
         public void ApplyGravity(Player player)

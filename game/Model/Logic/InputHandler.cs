@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace Game.Model
@@ -23,7 +19,6 @@ namespace Game.Model
                 _pressedKeysPlayer2.Add(key);
             }
         }
-
         public void ReleaseKey(Keys key)
         {
             if (IsPlayer1Key(key))
@@ -35,7 +30,6 @@ namespace Game.Model
                 _pressedKeysPlayer2.Remove(key);
             }
         }
-
         public bool IsKeyPressed(Keys key, int playerNumber)
         {
             return playerNumber == 1

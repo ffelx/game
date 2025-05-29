@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Game.Model
+﻿namespace Game.Model
 {
     internal class Bullet
     {
@@ -12,7 +6,7 @@ namespace Game.Model
         public float Y { get; set; }
         public float Speed { get; } = 10f;
         public Player.Direction Direction { get; }
-        public int Width { get; } = 10;
+        public int Width { get; } = 15;
         public int Height { get; } = 5;
         public float KnockbackForce { get; } = 20f;
 

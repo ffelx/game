@@ -21,7 +21,6 @@ namespace Game.View
         {
             LoadTextures();
         }
-
         private void LoadTextures()
         {
             _playerTextureRight = new Bitmap("Images/player1.png");

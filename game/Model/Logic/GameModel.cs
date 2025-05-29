@@ -14,9 +14,10 @@ namespace Game.Model
         private BotController _botController;
         private bool _isBotGame = false;
 
-        public int SecondPlayerScore { get; set; }
         public int FirstPlayerScore { get; set; }
+        public int SecondPlayerScore { get; set; }
         private int _maxScore = 5;
+        private bool isEndGame = false;
 
         public const int Width = 1280;
         public const int Height = 720;
@@ -24,7 +25,10 @@ namespace Game.Model
         public List<Player> Players { get; private set; }
         public Ground[] Grounds { get; private set; }
         
+
         public event Action Updated;
+        public event Action<int> GameOver;
+
         public GameModel(bool isBotGame = false)
         {
             SetGrounds();          
@@ -52,12 +56,6 @@ namespace Game.Model
                 new Player(350, 720),
                 new Player(870, 720) { CurrentDirection = Player.Direction.Left}
             };
-            //if (_isBotGame)
-            //{
-            //    Players[1].JumpForce += 20f;
-            //}
-           
-
         }
 
         private void SetGrounds()
@@ -75,6 +73,7 @@ namespace Game.Model
 
         private void Update()
         {
+            if (isEndGame) return;
             for (int i = 0; i < Players.Count; i++)
             {
                 int playerNumber = i + 1;
@@ -91,7 +90,6 @@ namespace Game.Model
         {
             if (player.Y < -player.Height)
             {
-                Console.WriteLine("sds");
                 if (playerNumber == 1)
                 {
                     SecondPlayerScore += 1;
@@ -103,24 +101,23 @@ namespace Game.Model
                 player.VelocityY = 0;
                 player.X = player.StartPoint.X;
                 player.Y = player.StartPoint.Y;
+                TryGameOver();
             }
         }
 
-        public bool IsGameOver(out int winPlayerNumber)
+        public void TryGameOver()
         {
-            winPlayerNumber = 0;
-            
             if (FirstPlayerScore >= _maxScore)
             {
-                winPlayerNumber = 1;
-                return true;
+                isEndGame = true;
+                GameOver?.Invoke(1);
+                
             }
             else if (SecondPlayerScore >= _maxScore)
             {
-                winPlayerNumber = 2;
-                return true;
+                isEndGame = true;
+                GameOver?.Invoke(2);
             }
-            return false;
         }
 
         private void PlayerOrBotUpdate(Player player, int playerNumber)
@@ -163,7 +160,6 @@ namespace Game.Model
                 player.Stop();
             }
         }
-
         private void MoveUpDown(Player player, int playerNumber)
         {
             bool isGround = _physics.TryLandOnGround(player, Grounds, out var ground);
